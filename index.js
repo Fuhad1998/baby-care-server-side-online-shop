@@ -21,12 +21,68 @@ async function run (){
         await client.connect();
         const database = client.db('baby-care-online-shope')
         const productCollection = database.collection('products')
+        const orderCollection = database.collection('orders');
+        const reviewCollection = database.collection('reviews');
 
 
         app.get('/products', async (req, res)=>{
             const cursor = productCollection.find({});
             const products = await cursor.toArray();
             res.send(products)
+        })
+
+
+        app.post('/products', async(req, res)=>{
+            const products = req.body;
+            const result = await productCollection.insertOne(products);
+            res.json(result)
+        })
+
+
+
+
+
+
+        app.post('/orders', async(req, res)=>{
+            const orders = req.body;
+            orders.createdAt = new Date()
+            const result = await orderCollection.insertOne(orders);
+            res.json(result)
+        })
+
+        // app.get('/orders', async (req, res)=>{
+            
+        //     const cursor = orderCollection.find({});
+        //     const orders = await cursor.toArray();
+        //     res.send(orders)
+        // })
+
+
+        app.get('/orders', async (req, res)=>{
+            const email = req.query.email;
+            const query = {email: email}
+            console.log(query)
+            const cursor = orderCollection.find(query);
+            const orders = await cursor.toArray();
+            res.send(orders)
+        })
+
+
+
+
+        app.post('/reviews', async(req, res)=>{
+            const reviews = req.body;
+            const result = await reviewCollection.insertOne(reviews);
+            res.json(result)
+        })
+
+
+        // Get reviews
+
+        app.get('/reviews', async (req, res)=>{
+            const cursor = reviewCollection.find({});
+            const reviews = await cursor.toArray();
+            res.send(reviews)
         })
 
 
@@ -39,8 +95,6 @@ async function run (){
 
 
 
-
-        
 
 
 
