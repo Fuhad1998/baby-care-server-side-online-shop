@@ -23,12 +23,23 @@ async function run (){
         const productCollection = database.collection('products')
         const orderCollection = database.collection('orders');
         const reviewCollection = database.collection('reviews');
+        const userCollection = database.collection('users');
 
 
         app.get('/products', async (req, res)=>{
-            const cursor = productCollection.find({});
-            const products = await cursor.toArray();
-            res.send(products)
+            const category = req.query.category;
+            let query 
+            if (category){
+                query = {category}
+            }
+            else{
+                query={}
+            }
+            const cursor = productCollection.find(query);
+            console.log(query)
+            const orders = await cursor.toArray();
+            res.send(orders)
+            console.log(orders)
         })
 
 
@@ -84,20 +95,49 @@ async function run (){
             res.send(reviews)
         })
 
+        // post users
+
+        app.post('/users', async(req, res)=>{
+            const users = req.body;
+            const result = await userCollection.insertOne(users)
+            
+            res.json(result)
+        })
+
+        app.put('/users', async(req, res)=>{
+            const user = req.body;
+            const filter = {email: user.email}
+            const options = {upsert: true}
+            const updateDoc = {$set: user}
+            const result = await userCollection.updateOne(filter, updateDoc, options)
+            res.json(result)
+        })
 
 
 
+        app.put('/users/admin', async (req, res) =>{
+            const user = req.body;
+            const filter = {email: user.email}
+            const updateDoc ={$set: {role: 'admin'}}
+            const result = await userCollection.updateOne(filter, updateDoc)
+            res.json(result)
+        })
 
 
 
+        app.get('/users/:email', async(req, res)=>{
+            const email = req.params.email;
+            const query = {email: email}
+            const user = await userCollection.findOne(query)
+            let isAdmin = false;
+            if(user?.role === 'admin'){
+                isAdmin= true;
+            }
+            res.json({admin: isAdmin})
+        })
 
 
 
-
-
-
-
-        
     }
     finally{
         // await client.close()
