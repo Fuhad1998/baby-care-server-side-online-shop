@@ -36,10 +36,10 @@ async function run (){
                 query={}
             }
             const cursor = productCollection.find(query);
-            console.log(query)
+            // console.log(query)
             const orders = await cursor.toArray();
             res.send(orders)
-            console.log(orders)
+            // console.log(orders)
         })
 
 
