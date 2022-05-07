@@ -77,6 +77,19 @@ async function run (){
             res.send(orders)
         })
 
+        // delate orders
+
+        app.delete('/orders/:id', async (req, res) =>{
+            const id = req.params.id;
+            console.log(id)
+            const query = {_id:ObjectId(id)};
+            console.log(query)
+
+            const result = await orderCollection.deleteOne(query)
+            console.log("delate click", result)
+            res.json(result)
+        })
+
 
 
 
